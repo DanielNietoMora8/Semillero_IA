@@ -14,7 +14,7 @@ class SoundscapeData(Dataset):
     to return.
     """
 
-    def __init__(self, root_path: str, audio_length: int, ext: str = "wav", win_length: int = 255):
+    def __init__(self, root_path: str, audio_length: int, ext: str = "wav", win_length: int = 255, original_length=60):
 
         """
         This function is used to initialize the Dataloader, here path and root of files are defined.
@@ -34,6 +34,7 @@ class SoundscapeData(Dataset):
             dir_root = "G:/Unidades compartidas/"
 
         self.audio_length = audio_length
+        self.original_length = original_length
         self.root_path = dir_root+root_path
         print(self.root_path)
         self.win_length = win_length
@@ -80,7 +81,9 @@ class SoundscapeData(Dataset):
         audio_len = self.audio_length * resampling
         record = torch.mean(record, dim=0, keepdim=True)
         record = torchaudio.transforms.Resample(sr, resampling)(record)
-        record = record[:, :1300950]
+        missing_padding = resampling * self.original_length - record.shape[1]
+        padding = torch.zeros([1, missing_padding])
+        record = torch.cat((record, padding), axis=1)
         record = record[:, :audio_len * (record.shape[1] // audio_len)]
         record = torch.reshape(record, (record.shape[1] // audio_len, audio_len))
         win_length = self.win_length
@@ -90,7 +93,7 @@ class SoundscapeData(Dataset):
                                                  power=2,
                                                  normalized=False)(record)
 
-        spec = spec[0]
+        # spec = spec[0]
         spec = torch.log1p(spec)
         spec = torch.unsqueeze(spec, 0)
         # print(f"spec2: {spec.shape}")
@@ -99,7 +102,7 @@ class SoundscapeData(Dataset):
         # # print(record.shape)
         # spec = db(spec)
         # spec = torch.squeeze(spec, dim=1)
-        return spec, record[0], label
+        return spec, record, label, str(path_index)
 
     def __len__(self):
 
