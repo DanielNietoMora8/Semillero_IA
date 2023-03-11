@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # **Análisis exploratorio de la base de datos acústica**
 
 En esta sección, se llevará a cabo un análisis exploratorio de la base de datos Jaguas_2018. Se generarán documentos importantes, como tablas en formato .csv, que contienen información relevante de los audios.
@@ -22,8 +21,3 @@ El archivo df_archivos.csv contiene información para cada grabación, y se crea
 ## **Información adicional**
 
 Para más detalles sobre el proceso de análisis exploratorio, o si tiene preguntas o comentarios sobre este análisis, no dude en ponerse en contacto con nosotros.
-=======
-# Semillero_IA
-
-## Aqui debemos poner una documentación.
->>>>>>> psd
