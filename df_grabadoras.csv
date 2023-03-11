@@ -1,0 +1,32 @@
+Recorder,Municipio,Vereda,Latitud,Longitud,Elevacion,Habitat,Total_grabaciones
+G03,Alejandria,El Respaldo,6.4137,-75.0366,1322,Forest,565
+G04,San Roque,Playa Rica,6.4286,-75.0281,1310,Forest,418
+G06,Alejandria,El Respaldo,6.4088,-75.0453,1302,Forest,887
+G07,San Roque,El Nucito,6.4287,-75.0368,1296,Non- forest,621
+G08,Alejandria,El Respaldo,6.4061,-75.0534,1314,Non- forest,648
+G09,Santo Domingo,Nusito-Dantas,6.4204,-75.0474,1346,Forest,908
+G13,Alejandria,El Respaldo,6.3968,-75.0186,1349,Forest,636
+G15,San Roque,Playa Rica,6.4045,-75.0143,1325,Forest,874
+G17,Alejandria,El Respaldo,6.3978,-75.0444,1389,Non- forest,870
+G19,Alejandria,El Respaldo,6.4075,-75.0308,1376,Non- forest,886
+G23,Alejandria,San Lorenzo,6.3867,-75.0276,1327,Forest,555
+G24,Alejandria,El Respaldo,6.3903,-75.0422,1315,Forest,555
+G25,Alejandria,El Respaldo,6.3971,-75.0272,1320,Forest,645
+G27,Alejandria,El Respaldo,6.3887,-75.0136,1289,Non- forest,644
+G28,Alejandria,San Lorenzo,6.3841,-75.0348,1296,Forest,553
+G29,Alejandria,San Lorenzo,6.3806,-75.0448,1348,Forest,553
+G34,Alejandria,El Cerro,6.3815,-74.9929,1330,Non- forest,664
+G35,Alejandria,El Cerro,6.3738,-75.0247,1293,Forest,627
+G36,Alejandria,El Cerro,6.3744,-74.9979,1255,Non- forest,545
+G37,Alejandria,El Cerro,6.3672,-75.0286,1303,Forest,541
+G40,Alejandria,El Cerro,6.3683,-75.0182,1336,Forest,555
+G41,Alejandria,El Cerro,6.373,-75.0072,1315,Non- forest,553
+G46,San Rafael,Area proteccion embalse EPM,6.3493,-74.9931,1025,Forest,735
+G47,San Rafael,Area proteccion embalse EPM,6.3523,-74.9852,1028,Forest,804
+G49,San Rafael,Area proteccion embalse EPM,6.3459,-75.0024,1086,Forest,801
+G50,San Rafael,Area proteccion embalse EPM,6.3721,-74.9879,1273,Forest,620
+G51,San Rafael,Area proteccion embalse EPM,6.3602,-75.0071,1368,Forest,408
+G52,San Rafael,Area proteccion embalse EPM,6.3448,-74.9718,1324,Forest,465
+G54,San Rafael,Area proteccion embalse EPM,6.3586,-74.9896,1101,Forest,576
+G57,San Rafael,Area proteccion embalse EPM,6.3579,-74.9651,1308,Forest,621
+G58,San Rafael,Area proteccion embalse EPM,6.3471,-74.9696,1072,Forest,735
