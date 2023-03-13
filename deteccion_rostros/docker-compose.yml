@@ -1,0 +1,8 @@
+services:
+  deteccion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+
+
