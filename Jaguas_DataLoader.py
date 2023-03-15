@@ -14,22 +14,29 @@ class SoundscapeData(Dataset):
     to return.
     """
 
-    def __init__(self, root_path: str, audio_length: int, ext: str = "wav", win_length: int = 255, original_length=60):
+    def __init__(self, root_path: str, audio_length: int, ext: str = "wav",
+                 win_length: int = 255, original_length: int = 60):
 
         """
         This function is used to initialize the Dataloader, here path and root of files are defined.
 
-        :param root_path: Main root of all files.
+        :param root_path: Files directory.
         :type root_path: str
-        :param path_labels: Path of the unique file containing audios information.
-        :type path_labels: str
-        :param path_names: Path of a file that contains audios root.
-        :type path_names: str
+        :param audio_length: Desired audio length partitions.
+        :type audio_length: int
+        :param ext: Audios format (e.g., .wav).
+        :type ext: str
         :param ext: Audios extension (ex: .wav)
+        :param win_length: Window length used to compute the fourier transform.
+        :type win_length: int
+        :param original_length: Duration in seconds of the original audios.
+        :type original_length:
         """
 
         if 'google.colab' in str(get_ipython()):
             dir_root = "/content/drive/Shareddrives/"
+        elif "zmqshell" in str(get_ipython()):
+            dir_root = "/"
         else:
             dir_root = "G:/Unidades compartidas/"
 
@@ -48,22 +55,22 @@ class SoundscapeData(Dataset):
     def __getitem__(self, index):
 
         """
-        Function used to return audios and spectrograms based on the batch size. Here it is searched and processed the
-        files to return each audio with it respective.
+        Function used to return audios and its respective spectrogram. Partitions of audios are made based on the
+        users' parameterization. An additional axes for partitions is returned.
 
         :param index: index indicates the number of data to return.
         :returns:
             :spec: Spectrogram of the indexed audios.
             :type spec: torch.tensor
-            :record: array representation of the indexed audios.
+            :record: Array of indexed audios in monophonic format.
             :type record: numpy.array
-            :sr: Sample rate.
-            :type sr: int
-            :features: Audio labels from the info file.
-            :type features: Dataframe.
+            :label: Dictionary of labels including recorder, hour, minute and second keys.
+            :type label: Dictionary
+            :path_index: File directory.
+            :type path index: String
 
         """
-        if 'google.colab' in str(get_ipython()):
+        if 'google.colab' in str(get_ipython()) or "zmqshell" in str(get_ipython()):
             delimiter = "/"
         else:
             delimiter = "\\"
@@ -74,7 +81,10 @@ class SoundscapeData(Dataset):
         hour = int(str(path_index).split(delimiter)[-1].split("_")[2].split(".")[0][0:2])
         minute = int(str(path_index).split(delimiter)[-1].split("_")[2].split(".")[0][2:4])
         second = int(str(path_index).split(delimiter)[-1].split("_")[2].split(".")[0][4:6])
-        label = {"recorder": recorder, "hour": hour, "minute": minute, "second": second}
+        label = {"recorder": np.repeat(recorder, self.original_length//self.audio_length),
+                 "hour": np.repeat(hour, self.original_length//self.audio_length),
+                 "minute": np.repeat(minute, self.original_length//self.audio_length),
+                 "second": np.repeat(second, self.original_length//self.audio_length)}
 
         record, sr = torchaudio.load(path_index)
         resampling = 22050
@@ -102,7 +112,8 @@ class SoundscapeData(Dataset):
         # # print(record.shape)
         # spec = db(spec)
         # spec = torch.squeeze(spec, dim=1)
-        return spec, record, label, str(path_index)
+        path_index = str(path_index)
+        return spec, record, label, path_index
 
     def __len__(self):
 

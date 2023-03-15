@@ -7,14 +7,48 @@ from torchvision.utils import make_grid
 import torchaudio.transforms as audio_transform
 import torch.nn.functional as F
 import wandb
+from IPython.display import clear_output
 from wandb import AlertLevel
 import datetime
 from datetime import timedelta
 
 
 class TestModel:
+    """
+            Class to test convolutional autoencoder models.
+
+    """
+
+    """
+
+            :param index: index indicates the number of data to return.
+            :returns:
+                :spec: Spectrogram of the indexed audios.
+                :type spec: torch.tensor
+                :record: Array of indexed audios in monophonic format.
+                :type record: numpy.array
+                :label: Dictionary of labels including recorder, hour, minute and second keys.
+                :type label: Dictionary
+                :path_index: File directory.
+                :type path index: String
+
+    """
 
     def __init__(self, model, iterator, num_views=8, device="cuda"):
+
+        """
+            :param model: Deep learning model.
+            :type model:
+            :param iterator: dataloader iterator.
+            :type iterator:
+            :param num_views: Specify the number of samples to visualize previously and after the reconstruction.
+            :type num_views:
+            :param device: Specify the device to do calculus.
+            :type device:
+            Todo:
+                Check the args type.
+            """
+
         self._model = model
         self._iterator = iterator
         self.num_views = num_views
@@ -59,9 +93,10 @@ class TestModel:
 
     def reconstruct(self):
         self._model.eval()
-        (valid_originals, _, label) = next(self._iterator)
-        valid_originals = torch.reshape(valid_originals, (valid_originals.shape[0] * valid_originals.shape[1],
-                                                          valid_originals.shape[2], valid_originals.shape[3]))
+        (valid_originals, _, label, path) = next(self._iterator)
+        valid_originals = torch.reshape(valid_originals, (valid_originals.shape[0] * valid_originals.shape[1]
+                                                          * valid_originals.shape[2], valid_originals.shape[3],
+                                                          valid_originals.shape[4]))
         valid_originals = torch.unsqueeze(valid_originals, 1)
         valid_originals = valid_originals.to(self.device)
 
@@ -75,7 +110,7 @@ class TestModel:
         BCE = F.mse_loss(valid_reconstructions, valid_originals)
         loss = BCE
 
-        return valid_originals, valid_reconstructions, valid_encodings, label, loss
+        return valid_originals, valid_reconstructions, valid_encodings, label, loss, path
 
     def run(self, plot=True, wave_return=True, wave_plot=True, directory=None):
         wave_original = []
@@ -148,14 +183,14 @@ class TrainModel:
             for i in xrange(config["num_training_updates"]):
                 self._model.train()
                 try:
-                    data, _, _ = next(iterator_train)
+                    data, _, _, _ = next(iterator_train)
                 except Exception as e:
                     print("error")
                     print(e)
                     logs.append(e)
                     continue
 
-                data = torch.reshape(data, (data.shape[0] * data.shape[1], data.shape[2], data.shape[3]))
+                data = torch.reshape(data, (data.shape[0] * data.shape[1] * data.shape[2], data.shape[3], data.shape[4]))
                 data = torch.unsqueeze(data, 1)
                 data = data.to(self.device)
 
@@ -171,14 +206,14 @@ class TrainModel:
                 dict = {"loss": loss.item()}
                 self.wandb_logging(dict)
 
-                if (i + 1) % 20 == 0:
+                if (i + 1) % 200 == 0:
                     try:
                         test_ = TestModel(self._model, iterator, 8, device=torch.device("cuda"))
                         # torch.save(model.state_dict(),f'model_{epoch}_{i}.pkl')
-                        originals, reconstructions, encodings, labels, test_error = test_.reconstruct()
+                        originals, reconstructions, encodings, labels, test_error, path = test_.reconstruct()
                         fig = test_.plot_reconstructions(originals, reconstructions)
                         images = wandb.Image(fig, caption=f"recon_error: {np.round(test_error.item(), 4)}")
-                        self.wandb_logging({"examples": images, "step": i + 1 // 20})
+                        self.wandb_logging({"examples": images, "step": (i + 1) // 20})
 
                     except Exception as e:
                         print(f"error; {e}")
@@ -188,12 +223,12 @@ class TrainModel:
                     pass
 
                 if loss < 0.04:
-                    wandb.alert(
-                        title='High accuracy',
-                        text=f'Recon error {loss} is lower than 0.04',
-                        level=AlertLevel.WARN,
-                        wait_duration=timedelta(minutes=1)
-                    )
+                    # wandb.alert(
+                    #     title='High accuracy',
+                    #     text=f'Recon error {loss} is lower than 0.04',
+                    #     level=AlertLevel.WARN,
+                    #     wait_duration=timedelta(minutes=1)
+                    # )
                     time = datetime.datetime.now()
                     torch.save(self._model.state_dict(), f'{run_name}_day_{time.day}_hour_{time.hour}_low_error.pkl')
                 else:
@@ -202,8 +237,9 @@ class TrainModel:
             scheduler.step()
             torch.cuda.empty_cache()
             time = datetime.datetime.now()
-            torch.save(self._model.state_dict(), f'{run_name}_day_{time.day}_hour_{time.hour}_epoch_{epoch + 1}.pkl')
-            # output.clear()
+            torch.save(self._model.state_dict(),
+                       f'temporal/models/model_{run_name}_day_{time.day}_hour_{time.hour}_epoch_{epoch+1}.pth')
+            clear_output()
             print(optimizer.state_dict()["param_groups"][0]["lr"])
 
         wandb.finish()
