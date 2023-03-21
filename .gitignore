@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/Semillero_IA/Semillero_IA/PSD/Imagenes/
